@@ -12,13 +12,10 @@ public class UserDetailsImpl implements UserDetails {
     private final String password;
     private final List<GrantedAuthority> rolesAndAuthorities;
 
-    private final boolean locked;
-
     public UserDetailsImpl(User user) {
-        username = user.getLastname();
+        username = user.getEmail();
         password = user.getPassword();
-        locked = user.isLocked();
-        rolesAndAuthorities = List.of(new SimpleGrantedAuthority("ROLE_"+user.getRole()));
+        rolesAndAuthorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 
     @Override
@@ -54,6 +51,6 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return !locked;
+        return true;
     }
 }

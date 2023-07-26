@@ -1,36 +1,41 @@
 package account.services;
 
+import account.Controller;
+import account.data.User;
 import account.data.UserRepository;
+import account.exceptions.UserExistException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class AuthenticationService {
-
-    private static final String EMAIL_ENDS = "@acme.com";
-
+    Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
+    @Autowired
     private UserRepository userRepo;
+    @Autowired
+    PasswordEncoder encoder;
 
-    public ResponseEntity signup(Map<String, String> map) {
-        String name = map.get("name");
-        String lastname = map.get("lastname");
-        String email = map.get("email");
-        String password = map.get("password");
-        if (name == null || lastname == null || email == null || password == null) {
-            return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+    public void signup(User user) {
+        Optional<User> optional = userRepo.findByEmailIgnoreCase(user.getEmail());
+        if (optional.isPresent()) {
+            throw new UserExistException("User exist!");
         }
-        if (name.isEmpty() || lastname.isEmpty() || !email.endsWith(EMAIL_ENDS) || password.isEmpty()) {
-            return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
-        }
-        Map<String, String> response = new HashMap<>();
-        response.put("name", name);
-        response.put("lastname", lastname);
-        response.put("email", email);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        user.setPassword(encoder.encode(user.getPassword()));
+        user = userRepo.save(user);
+    }
+
+    public Optional<User> getUser(String username) {
+        return userRepo.findByEmailIgnoreCase(username);
     }
 
 }
