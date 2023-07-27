@@ -22,11 +22,8 @@ public class SecurityConfiguration {
                 .authorizeRequests() // manage access
                 .requestMatchers(HttpMethod.POST, "api/auth/signup").permitAll()
                 .requestMatchers("/actuator/shutdown").permitAll() // needs to run test
-               // .requestMatchers("/**").authenticated()
-                .requestMatchers(HttpMethod.POST, "api/auth/changepass").hasAnyRole(User.Role.ADMINISTRATOR.name(),
-                        User.Role.USER.name(), User.Role.ACCOUNTANT.name())               // other matchers
-               // .requestMatchers(HttpMethod.GET, "api/empl/payment").permitAll()
-                .requestMatchers(HttpMethod.GET, "api/empl/payment/**").hasAnyRole(User.Role.ADMINISTRATOR.name())
+                .requestMatchers(HttpMethod.POST, "api/auth/changepass").permitAll()
+                .requestMatchers(HttpMethod.GET, "api/empl/payment").permitAll()
                 .requestMatchers(HttpMethod.POST, "api/acct/payments").hasRole(User.Role.ACCOUNTANT.name())
                 .requestMatchers(HttpMethod.PUT, "api/acct/payments").hasRole(User.Role.ACCOUNTANT.name())
                 .requestMatchers(HttpMethod.PUT, "/api/auth/access/**").hasRole(User.Role.ADMINISTRATOR.name())

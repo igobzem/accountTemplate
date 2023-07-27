@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 
 @Entity
@@ -22,6 +23,7 @@ public class User {
     private String name;
     @NotEmpty
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+ //   @Min(value = 12, message = "The password length must be at least 12 chars!")
     private String password;
     @NotEmpty
     @Email(regexp = "^(.+)@acme.com$")

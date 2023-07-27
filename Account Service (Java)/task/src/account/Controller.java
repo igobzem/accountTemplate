@@ -1,6 +1,8 @@
 package account;
 
+import account.data.NewPasswordDto;
 import account.data.User;
+import account.exceptions.UserValidationException;
 import account.services.AuthenticationService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -30,8 +32,19 @@ public class Controller {
     }
 
     @PostMapping("api/auth/changepass")
-    public ResponseEntity changepass(@RequestBody Map<String, String> map) {
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity changepass(@AuthenticationPrincipal UserDetails details, @RequestBody NewPasswordDto newPassword) {
+        logger.info("+++++"+newPassword);
+        if (details != null) {
+            Optional<User> user = authService.getUser(details.getUsername());
+            if (user.isPresent()) {
+                authService.changepass(user.get(), newPassword.getNewPassword());
+                Map<String,String> map = new HashMap<>();
+                map.put( "email", user.get().getEmail().toLowerCase());
+                map.put("status", "The password has been updated successfully");
+                return new ResponseEntity(map, HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     @GetMapping("api/empl/payment")

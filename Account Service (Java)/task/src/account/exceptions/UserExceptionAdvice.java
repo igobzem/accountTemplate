@@ -22,26 +22,18 @@ import java.util.Objects;
 public class UserExceptionAdvice {
 
 
-    @ExceptionHandler(UserExistException.class)
+    @ExceptionHandler(UserValidationException.class)
     public ResponseEntity<CustomErrorMessage> handleUserNotFound(
-            UserExistException e, WebRequest request) {
+            UserValidationException e, HttpServletRequest request) {
 
         CustomErrorMessage body = new CustomErrorMessage(
                 HttpStatus.BAD_REQUEST.value(),
                 "Bad Request",
                 LocalDateTime.now(),
                 e.getMessage(),
-                request.getDescription(false));
+                request.getRequestURI());
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
-
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("timestamp", LocalDate.now());
-//        return ResponseEntity.badRequest().body(request);
-//    }
 
 }
