@@ -22,14 +22,14 @@ public class SecurityConfiguration {
                 .authorizeRequests() // manage access
                 .requestMatchers(HttpMethod.POST, "api/auth/signup").permitAll()
                 .requestMatchers("/actuator/shutdown").permitAll() // needs to run test
-                .requestMatchers(HttpMethod.POST, "api/auth/changepass").permitAll()
-                .requestMatchers(HttpMethod.GET, "api/empl/payment").permitAll()
-                .requestMatchers(HttpMethod.POST, "api/acct/payments").hasRole(User.Role.ACCOUNTANT.name())
-                .requestMatchers(HttpMethod.PUT, "api/acct/payments").hasRole(User.Role.ACCOUNTANT.name())
-                .requestMatchers(HttpMethod.PUT, "/api/auth/access/**").hasRole(User.Role.ADMINISTRATOR.name())
-                .requestMatchers(HttpMethod.GET, "api/admin/user").hasRole(User.Role.ADMINISTRATOR.name())
-                .requestMatchers(HttpMethod.DELETE, "api/admin/user").hasRole(User.Role.ADMINISTRATOR.name())
-                .requestMatchers(HttpMethod.PUT, "api/admin/user/role").hasRole(User.Role.ADMINISTRATOR.name())
+                //.requestMatchers(HttpMethod.POST, "api/auth/changepass").permitAll()
+               .requestMatchers(HttpMethod.GET, "api/empl/payment").hasRole(User.Role.ADMINISTRATOR.name())
+//                .requestMatchers(HttpMethod.POST, "api/acct/payments").hasRole(User.Role.ACCOUNTANT.name())
+//                .requestMatchers(HttpMethod.PUT, "api/acct/payments").hasRole(User.Role.ACCOUNTANT.name())
+//                .requestMatchers(HttpMethod.PUT, "/api/auth/access/**").hasRole(User.Role.ADMINISTRATOR.name())
+//                .requestMatchers(HttpMethod.GET, "api/admin/user").hasRole(User.Role.ADMINISTRATOR.name())
+//                .requestMatchers(HttpMethod.DELETE, "api/admin/user").hasRole(User.Role.ADMINISTRATOR.name())
+//                .requestMatchers(HttpMethod.PUT, "api/admin/user/role").hasRole(User.Role.ADMINISTRATOR.name())
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS); // no session

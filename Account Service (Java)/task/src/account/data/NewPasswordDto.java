@@ -1,14 +1,13 @@
 package account.data;
 
+import account.exceptions.ValidPassword;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 
 public class NewPasswordDto {
-
-    @NotEmpty
     @JsonProperty("new_password")
- //   @Min(value = 12, message = "The password length must be at least 12 chars!")
+    @ValidPassword
     private String newPassword;
 
     public String getNewPassword() {

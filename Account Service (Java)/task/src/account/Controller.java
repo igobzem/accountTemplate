@@ -2,7 +2,6 @@ package account;
 
 import account.data.NewPasswordDto;
 import account.data.User;
-import account.exceptions.UserValidationException;
 import account.services.AuthenticationService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -26,36 +25,29 @@ public class Controller {
     public AuthenticationService authService;
 
     @PostMapping("api/auth/signup")
-    public ResponseEntity singnup(@RequestBody @Valid User user) {
-        authService.signup(user);
-        return new ResponseEntity(user, HttpStatus.OK);
+    public User singnup(@RequestBody @Valid User user) {
+        return authService.signup(user);
     }
 
     @PostMapping("api/auth/changepass")
-    public ResponseEntity changepass(@AuthenticationPrincipal UserDetails details, @RequestBody NewPasswordDto newPassword) {
-        logger.info("+++++"+newPassword);
-        if (details != null) {
-            Optional<User> user = authService.getUser(details.getUsername());
-            if (user.isPresent()) {
-                authService.changepass(user.get(), newPassword.getNewPassword());
-                Map<String,String> map = new HashMap<>();
-                map.put( "email", user.get().getEmail().toLowerCase());
-                map.put("status", "The password has been updated successfully");
-                return new ResponseEntity(map, HttpStatus.OK);
-            }
+    public ResponseEntity changepass(@AuthenticationPrincipal UserDetails details, @RequestBody @Valid NewPasswordDto newPassword) {
+        if (details == null) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        User user = authService.changepass(details.getUsername(), newPassword.getNewPassword());
+        Map<String,String> map = new HashMap<>();
+        map.put( "email", user.getEmail().toLowerCase());
+        map.put("status", "The password has been updated successfully");
+        return new ResponseEntity(map, HttpStatus.OK);
     }
 
     @GetMapping("api/empl/payment")
     public ResponseEntity payment(@AuthenticationPrincipal UserDetails details) {
-        if (details != null) {
-            Optional<User> user = authService.getUser(details.getUsername());
-            if (user.isPresent()) {
-                return new ResponseEntity(user, HttpStatus.OK);
-            }
+        if (details == null) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        User user = authService.getUser(details.getUsername());
+        return new ResponseEntity(user, HttpStatus.OK);
     }
 
     @PostMapping("api/acct/payments")

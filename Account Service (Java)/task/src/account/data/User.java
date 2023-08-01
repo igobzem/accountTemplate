@@ -1,5 +1,6 @@
 package account.data;
 
+import account.exceptions.ValidPassword;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -21,9 +22,8 @@ public class User {
     private String lastname;
     @NotEmpty
     private String name;
-    @NotEmpty
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
- //   @Min(value = 12, message = "The password length must be at least 12 chars!")
+    @ValidPassword
     private String password;
     @NotEmpty
     @Email(regexp = "^(.+)@acme.com$")
