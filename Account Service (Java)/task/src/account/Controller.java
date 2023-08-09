@@ -1,7 +1,9 @@
 package account;
 
 import account.data.NewPasswordDto;
+import account.data.PaymentDto;
 import account.data.User;
+import account.services.AccountService;
 import account.services.AuthenticationService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -22,7 +24,9 @@ public class Controller {
     Logger logger = LoggerFactory.getLogger(Controller.class);
 
     @Autowired
-    public AuthenticationService authService;
+    private AuthenticationService authService;
+    @Autowired
+    private AccountService accountService;
 
     @PostMapping("api/auth/signup")
     public User singnup(@RequestBody @Valid User user) {
@@ -30,7 +34,7 @@ public class Controller {
     }
 
     @PostMapping("api/auth/changepass")
-    public ResponseEntity changepass(@AuthenticationPrincipal UserDetails details, @RequestBody @Valid NewPasswordDto newPassword) {
+    public ResponseEntity<Map> changepass(@AuthenticationPrincipal UserDetails details, @RequestBody @Valid NewPasswordDto newPassword) {
         if (details == null) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
@@ -42,34 +46,33 @@ public class Controller {
     }
 
     @GetMapping("api/empl/payment")
-    public ResponseEntity payment(@AuthenticationPrincipal UserDetails details) {
+    public ResponseEntity payments(@AuthenticationPrincipal UserDetails details, @RequestParam(required = false) String period) {
         if (details == null) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
         User user = authService.getUser(details.getUsername());
-        return new ResponseEntity(user, HttpStatus.OK);
+        if (period == null) {
+            return new ResponseEntity(accountService.getPayments(user), HttpStatus.OK);
+        }
+        return new ResponseEntity(accountService.getPayment(user, period), HttpStatus.OK);
     }
 
     @PostMapping("api/acct/payments")
-    public ResponseEntity payments(@RequestBody Map<String, String> map) {
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<Map<String,String>> payments(@RequestBody List<@Valid PaymentDto> dtos) {
+        logger.info("+++++++post+++payments+++++");
+        accountService.addPayments(dtos);
+        Map<String,String> map = new HashMap<>();
+        map.put("status", "Added successfully!");
+        return new ResponseEntity(map, HttpStatus.OK);
     }
 
     @PutMapping("api/acct/payments")
-    public ResponseEntity putPayments(@RequestBody Map<String, String> map) {
-        return new ResponseEntity(HttpStatus.OK);
-    }
-    @GetMapping("api/admin/user")
-    public ResponseEntity getUser(@RequestBody Map<String, String> map) {
-        return new ResponseEntity(HttpStatus.OK);
-    }
-    @DeleteMapping("api/admin/user")
-    public ResponseEntity deleteUser(@RequestBody Map<String, String> map) {
-        return new ResponseEntity(HttpStatus.OK);
-    }
-    @PutMapping("api/admin/user/role")
-    public ResponseEntity putRole(@RequestBody Map<String, String> map) {
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity putPayment(@RequestBody PaymentDto dto) {
+        logger.info("+++++++put+payment+++++++"+dto);
+        accountService.changePayment(dto);
+        Map<String,String> map = new HashMap<>();
+        map.put("status", "Updated successfully!");
+        return new ResponseEntity(map, HttpStatus.OK);
     }
 
 }
